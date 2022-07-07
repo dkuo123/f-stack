@@ -56,7 +56,7 @@ Currently, besides authorized DNS server of DNSPod, there are various products i
     echo 1024 > /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
     echo 1024 > /sys/devices/system/node/node1/hugepages/hugepages-2048kB/nr_hugepages
 
-    # Using Hugepage with the DPDK (Linux only)
+    # Using Hugepage with the DPDK (Linux only) ==== skip it in our aws box as it has /dev/hugepages already
     mkdir /mnt/huge
     mount -t hugetlbfs nodev /mnt/huge
 
@@ -104,8 +104,8 @@ Currently, besides authorized DNS server of DNSPod, there are various products i
     #ln -s /usr/local/bin/pkg-config /usr/bin/pkg-config
  
     # Compile F-Stack
-    export FF_PATH=/data/f-stack
-    export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib/pkgconfig
+    export FF_PATH=/data/f-stack ------------->  export FF_PATH=`pwd`; at /home/archy/f-stack
+    export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib/pkgconfig --> export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib64/pkgconfig
     cd /data/f-stack/lib/
     make    # On Linux
     #gmake   # On FreeBSD
