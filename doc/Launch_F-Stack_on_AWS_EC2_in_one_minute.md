@@ -165,6 +165,6 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
 
     # start kni
     sleep 10
-    ifconfig veth0 ${myaddr}  netmask ${mymask}  broadcast ${mybc} hw ether ${myhw}
-    route add -net 0.0.0.0 gw ${mygw} dev veth0
-    echo 1 > /sys/class/net/veth0/carrier # if `carrier=on` not set while `insmod rte_kni.ko`.
+    sudo ifconfig veth0 ${myaddr}  netmask ${mymask}  broadcast ${mybc} hw ether ${myhw} -------> SIOCSIFHWADDR: Operation not supported
+    sudo route add -net 0.0.0.0 gw ${mygw} dev veth0 -------> Timeout, server ta-tky-c-07 not responding. then machine dead, can't be login again
+    sudo echo 1 > /sys/class/net/veth0/carrier # if `carrier=on` not set while `insmod rte_kni.ko`.
