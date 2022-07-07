@@ -61,7 +61,7 @@ export myaddr=10.50.12.75
 export mymask=255.255.255.0
 export mybc=10.50.12.255
 export myhw=06:0c:8b:7c:8c:e1
-export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`
+export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`         ======== sane as eth0, it's 10.50.12.1
 
 
     #redhat7.3 =========== use eth1 instead of eth0, otherwise, the machine will not accessable once "sudo ifconfig eth0 down"
