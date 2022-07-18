@@ -70,12 +70,12 @@
     export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
     export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
     export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
-    #Amazon Linux AMI 2017.03
-    #export myaddr=`ifconfig eth0 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
-    #export mymask=`ifconfig eth0 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
-    #export mybc=`ifconfig eth0 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
-    #export myhw=`ifconfig eth0 | grep "HWaddr" | awk -F ' ' '{print $5}'`
-    #export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
+            #Amazon Linux AMI 2017.03
+            #export myaddr=`ifconfig eth0 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
+            #export mymask=`ifconfig eth0 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
+            #export mybc=`ifconfig eth0 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
+            #export myhw=`ifconfig eth0 | grep "HWaddr" | awk -F ' ' '{print $5}'`
+            #export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
 
     sed "s/addr=192.168.1.2/addr=${myaddr}/" -i /data/f-stack/config.ini
     sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i /data/f-stack/config.ini
