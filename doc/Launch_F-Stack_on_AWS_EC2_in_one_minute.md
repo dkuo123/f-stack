@@ -115,46 +115,46 @@
     # offload NIC（if there is only one NIC，the follow commands must run in a script）
     (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
-Network devices using kernel driver
-===================================
-0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
-0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio *Active*
+    Network devices using kernel driver
+    ===================================
+    0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
+    0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio *Active*
 
-    sudo ifconfig eth1 down
-(base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
+        sudo ifconfig eth1 down
+    (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
-Network devices using kernel driver
-===================================
-0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
-0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio
-    
-    sudo usertools/dpdk-devbind.py --bind=igb_uio eth1
-(base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
+    Network devices using kernel driver
+    ===================================
+    0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
+    0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio
 
-Network devices using DPDK-compatible driver
-============================================
-0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena            ============ no more if on eth1?
+        sudo usertools/dpdk-devbind.py --bind=igb_uio eth1
+    (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
-Network devices using kernel driver
-===================================
-0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
+    Network devices using DPDK-compatible driver
+    ============================================
+    0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena            ============ no more if on eth1?
 
-(base) [archy@TA-TKY-C-07 dpdk]$ ifconfig
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
-        inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
-        ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
-        RX packets 2006  bytes 330758 (323.0 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 1844  bytes 441048 (430.7 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+    Network devices using kernel driver
+    ===================================
+    0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
 
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 350  bytes 53732 (52.4 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 350  bytes 53732 (52.4 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+    (base) [archy@TA-TKY-C-07 dpdk]$ ifconfig
+    eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+            inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
+            ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
+            RX packets 2006  bytes 330758 (323.0 KiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 1844  bytes 441048 (430.7 KiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+    lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+            inet 127.0.0.1  netmask 255.0.0.0
+            loop  txqueuelen 1000  (Local Loopback)
+            RX packets 350  bytes 53732 (52.4 KiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 350  bytes 53732 (52.4 KiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
 
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
