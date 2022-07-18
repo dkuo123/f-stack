@@ -32,36 +32,36 @@
     
     ====== use eth1 instead, leave eth0 for other normal app, use sudo reboot to recover all the machine settings from AWS.
     [root@TA-TKY-C-07 f-stack]# ifconfig
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
-        inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
-        ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
-        RX packets 2031848  bytes 2280930590 (2.1 GiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 1004053  bytes 334497678 (319.0 MiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+                inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
+                ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
+                RX packets 2031848  bytes 2280930590 (2.1 GiB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 1004053  bytes 334497678 (319.0 MiB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
-        inet 10.50.12.75  netmask 255.255.255.0  broadcast 10.50.12.255
-        ether 06:0c:8b:7c:8c:e1  txqueuelen 1000  (Ethernet)
-        RX packets 2947  bytes 138960 (135.7 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 103  bytes 35226 (34.4 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+                inet 10.50.12.75  netmask 255.255.255.0  broadcast 10.50.12.255
+                ether 06:0c:8b:7c:8c:e1  txqueuelen 1000  (Ethernet)
+                RX packets 2947  bytes 138960 (135.7 KiB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 103  bytes 35226 (34.4 KiB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 343956  bytes 53462136 (50.9 MiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 343956  bytes 53462136 (50.9 MiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+                inet 127.0.0.1  netmask 255.0.0.0
+                loop  txqueuelen 1000  (Local Loopback)
+                RX packets 343956  bytes 53462136 (50.9 MiB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 343956  bytes 53462136 (50.9 MiB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
         
- so replace it as:
-export myaddr=10.50.12.75
-export mymask=255.255.255.0
-export mybc=10.50.12.255
-export myhw=06:0c:8b:7c:8c:e1
-export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`         ======== sane as eth0, it's 10.50.12.1
+      so replace it as:
+        export myaddr=10.50.12.75
+        export mymask=255.255.255.0
+        export mybc=10.50.12.255
+        export myhw=06:0c:8b:7c:8c:e1
+        export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`    ======== same as eth0, it's 10.50.12.1
 
 
     #redhat7.3 =========== use eth1 instead of eth0, otherwise, the machine will not accessable once "sudo ifconfig eth0 down"
