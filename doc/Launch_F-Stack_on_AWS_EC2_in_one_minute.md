@@ -48,13 +48,11 @@
                 TX packets 103  bytes 35226 (34.4 KiB)
                 TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-        lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-                inet 127.0.0.1  netmask 255.0.0.0
-                loop  txqueuelen 1000  (Local Loopback)
-                RX packets 343956  bytes 53462136 (50.9 MiB)
-                RX errors 0  dropped 0  overruns 0  frame 0
-                TX packets 343956  bytes 53462136 (50.9 MiB)
-                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+       ip addr:
+          3: eth1: <BROADCAST,MULTICAST> mtu 9001 qdisc mq state DOWN group default qlen 1000
+              link/ether 06:0c:8b:7c:8c:e1 brd ff:ff:ff:ff:ff:ff
+              inet 10.50.12.75/24 brd 10.50.12.255 scope global dynamic eth1
+                 valid_lft 582sec preferred_lft 582sec
         
       so replace it as:
         export myaddr=10.50.12.75
