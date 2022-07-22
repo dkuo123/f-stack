@@ -5,11 +5,10 @@
     sudo -i
     yum install -y git gcc openssl-devel kernel-devel-$(uname -r) bc numactl-devel mkdir make net-tools vim pciutils iproute pcre-devel zlib-devel elfutils-libelf-devel meson
 
-    mkdir /data/f-stack
-    git clone https://github.com/F-Stack/f-stack.git /data/f-stack
+    git clone https://github.com/F-Stack/f-stack.git 
 
     # Compile DPDK
-    cd /data/f-stack/dpdk
+    cd f-stack/dpdk
     meson -Denable_kmods=true build
     ninja -C build
     ninja -C build install
@@ -47,13 +46,12 @@
                 RX errors 0  dropped 0  overruns 0  frame 0
                 TX packets 103  bytes 35226 (34.4 KiB)
                 TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+         ip addr:
+            3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc mq state UP group default qlen 1000
+                link/ether 06:0c:8b:7c:8c:e1 brd ff:ff:ff:ff:ff:ff
+                inet 10.50.12.75/24 brd 10.50.12.255 scope global dynamic eth1
+                valid_lft 2865sec preferred_lft 2865sec
 
-       ip addr:
-          3: eth1: <BROADCAST,MULTICAST> mtu 9001 qdisc mq state DOWN group default qlen 1000
-              link/ether 06:0c:8b:7c:8c:e1 brd ff:ff:ff:ff:ff:ff
-              inet 10.50.12.75/24 brd 10.50.12.255 scope global dynamic eth1
-                 valid_lft 582sec preferred_lft 582sec
-        
       so replace it as:
         export myaddr=10.50.12.75
         export mymask=255.255.255.0
@@ -68,27 +66,21 @@
     export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
     export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
     export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
-            #Amazon Linux AMI 2017.03
-            #export myaddr=`ifconfig eth0 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
-            #export mymask=`ifconfig eth0 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
-            #export mybc=`ifconfig eth0 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
-            #export myhw=`ifconfig eth0 | grep "HWaddr" | awk -F ' ' '{print $5}'`
-            #export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
+    cd ~/f-stack
+    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i config.ini
+    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i config.ini
+    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i config.ini
+    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i config.ini
 
-    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i /data/f-stack/config.ini
-    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i /data/f-stack/config.ini
-    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i /data/f-stack/config.ini
-    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i /data/f-stack/config.ini
-
-    # enable kni
-    sed "s/#\[kni\]/\[kni\]/" -i /data/f-stack/config.ini
-    sed "s/#enable=1/enable=1/" -i /data/f-stack/config.ini
-    sed "s/#method=reject/method=reject/" -i /data/f-stack/config.ini
-    sed "s/#tcp_port=80/tcp_port=80/" -i /data/f-stack/config.ini
-    sed "s/#vlanstrip=1/vlanstrip=1/" -i /data/f-stack/config.ini
+    # enable kni ---- skip it, as it's using eth1?
+    sed "s/#\[kni\]/\[kni\]/" -i config.ini
+    sed "s/#enable=1/enable=1/" -i config.ini
+    sed "s/#method=reject/method=reject/" -i config.ini
+    sed "s/#tcp_port=80/tcp_port=80/" -i config.ini
+    sed "s/#vlanstrip=1/vlanstrip=1/" -i config.ini
 
     # Upgrade pkg-config while version < 0.28
-    cd /data/
+    cd ~
     wget https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
     tar xzvf pkg-config-0.29.2.tar.gz
     cd pkg-config-0.29.2
@@ -101,8 +93,11 @@
     # Compile F-Stack lib
     export FF_PATH=/home/archy/f-stack
     export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib/pkgconfig
-    cd /data/f-stack/lib
+    cd ~/f-stack/lib
     make
+    sudo make install  ------ include and lib are in /usr/local/include and /usr/local/lib  
+                               /usr/local/bin/ff_start
+                                cp -f /home/archy/f-stack/lib/../config.ini /etc/f-stack.conf  --- customized config.ini file using eth1
 
     # Compile Nginx
     cd ../app/nginx-1.16.1
@@ -111,7 +106,7 @@
     make install   ============> installed to /usr/local/nginx_fstack
 
     # offload NIC（if there is only one NIC，the follow commands must run in a script）
-    (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
+    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
 
     Network devices using kernel driver
     ===================================
@@ -119,19 +114,19 @@
     0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio *Active*
 
         sudo ifconfig eth1 down
-    (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
+    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
 
     Network devices using kernel driver
     ===================================
     0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
     0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio
 
-        sudo usertools/dpdk-devbind.py --bind=igb_uio eth1
+        sudo ~/f-stack/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
     (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
     Network devices using DPDK-compatible driver
     ============================================
-    0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena            ============ no more if on eth1?
+    0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena            ============ no more if on eth1? using igb_uio driver now.
 
     Network devices using kernel driver
     ===================================
@@ -156,13 +151,39 @@
 
 
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
-    cp /data/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
+    sudo cp ~/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
+
+    # starting test program:
+    sudo ./example/helloworld --conf config.ini --proc-type=primary --proc-id=0
+    #test it on another box, or in browser: http://10.50.12.75/
+      [dev-guo](~ )$  curl --request GET      --url http://10.50.12.75:80
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <title>Welcome to F-Stack!</title>
+      <style>
+          body {
+              width: 35em;
+              margin: 0 auto;
+              font-family: Tahoma, Verdana, Arial, sans-serif;
+          }
+      </style>
+      </head>
+      <body>
+      <h1>Welcome to F-Stack!</h1>
+
+      <p>For online documentation and support please refer to
+      <a href="http://F-Stack.org/">F-Stack.org</a>.<br/>
+
+      <p><em>Thank you for using F-Stack.</em></p>
+      </body>
+      </html>
 
     # start Nginx
     sudo /usr/local/nginx_fstack/sbin/nginx
 
-    # start kni
+    # start kni  ---- skip it, as it's using eth1?
     sleep 10
-    sudo ifconfig veth0 ${myaddr}  netmask ${mymask}  broadcast ${mybc} hw ether ${myhw} -------> SIOCSIFHWADDR: Operation not supported
-    sudo route add -net 0.0.0.0 gw ${mygw} dev veth0 -------> Timeout, server ta-tky-c-07 not responding. then machine dead, can't be login again
-    sudo echo 1 > /sys/class/net/veth0/carrier # if `carrier=on` not set while `insmod rte_kni.ko`.
+    sudo ifconfig veth1 ${myaddr}  netmask ${mymask}  broadcast ${mybc} hw ether ${myhw} -------> SIOCSIFHWADDR: Operation not supported
+    sudo route add -net 0.0.0.0 gw ${mygw} dev veth1 -------> Timeout, server ta-tky-c-07 not responding. then machine dead, can't be login again
+    sudo echo 1 > /sys/class/net/veth1/carrier # if `carrier=on` not set while `insmod rte_kni.ko`.
