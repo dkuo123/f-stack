@@ -68,17 +68,35 @@
     cd ../app/nginx-1.16.1
     ./configure --prefix=/usr/local/nginx_fstack --with-ff_module
     make
-    make install
+    sudo make install
+      # to directory /usr/local/nginx_fstack
+
+        eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+                inet 10.50.12.75  netmask 255.255.255.0  broadcast 10.50.12.255
+                ether 06:0c:8b:7c:8c:e1  txqueuelen 1000  (Ethernet)
+                RX packets 1319  bytes 63236 (61.7 KiB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 1319  bytes 69798 (68.1 KiB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
     # offload NIC（if there is only one NIC，the follow commands must run in a script）
-    ifconfig eth0 down
-    python /data/f-stack/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth0
+    sudo ifconfig eth1 down
+    sudo ~/f-stack/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
+
+        ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
+          Network devices using DPDK-compatible driver
+          ============================================
+          0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena
+
+          Network devices using kernel driver
+          ===================================
+          0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
 
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
-    cp /data/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
+    sudo cp ~/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
 
     # start Nginx
-    /usr/local/nginx_fstack/sbin/nginx
+    sudo /usr/local/nginx_fstack/sbin/nginx
 
     # start kni
     sleep 10
