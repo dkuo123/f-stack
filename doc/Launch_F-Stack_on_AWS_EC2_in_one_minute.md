@@ -48,7 +48,7 @@
     sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i /data/f-stack/config.ini
     sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i /data/f-stack/config.ini
 
-      # enable kni === don't activate knni because dual NIC cards and I'm using eth1
+      # enable kni === don't activate kni because dual NIC cards and I'm using eth1
       sed "s/#\[kni\]/\[kni\]/" -i /data/f-stack/config.ini
       sed "s/#enable=1/enable=1/" -i /data/f-stack/config.ini
       sed "s/#method=reject/method=reject/" -i /data/f-stack/config.ini
@@ -95,10 +95,36 @@
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
     sudo cp ~/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
 
+    # test setup using hello world web app:
+    $ sudo ./example/helloworld --conf config.ini --proc-type=primary --proc-id=0
+    # on another box, do:
+      [dev-guo](~ )$  curl --request GET      --url http://10.50.12.75:80
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <title>Welcome to F-Stack!</title>
+      <style>
+          body {
+              width: 35em;
+              margin: 0 auto;
+              font-family: Tahoma, Verdana, Arial, sans-serif;
+          }
+      </style>
+      </head>
+      <body>
+      <h1>Welcome to F-Stack!</h1>
+
+      <p>For online documentation and support please refer to
+      <a href="http://F-Stack.org/">F-Stack.org</a>.<br/>
+
+      <p><em>Thank you for using F-Stack.</em></p>
+      </body>
+      </html>
+      
     # start Nginx
     sudo /usr/local/nginx_fstack/sbin/nginx
 
-    # start kni
+    # start kni --- skip it due to using eth1
     sleep 10
     ifconfig veth0 ${myaddr}  netmask ${mymask}  broadcast ${mybc} hw ether ${myhw}
     route add -net 0.0.0.0 gw ${mygw} dev veth0
