@@ -2,18 +2,20 @@
 
   If you have a Redhat7.3 EC2 instance，and then execute the following cmds, you will get the F-Stack server in one minute 
 
-    sudo -i
+    #sudo -i
+    #sudo su -
     yum install -y git gcc openssl-devel kernel-devel-$(uname -r) bc numactl-devel mkdir make net-tools vim pciutils iproute pcre-devel zlib-devel elfutils-libelf-devel vim
 
-    mkdir /data/f-stack
-    git clone https://github.com/F-Stack/f-stack.git /data/f-stack
+    git clone https://github.com/F-Stack/f-stack.git
 
     # Compile DPDK
-    cd /data/f-stack/dpdk
+    cd ~/f-stack
+    git checkout master
+    cd dpdk
     make config T=x86_64-native-linuxapp-gcc
     make
 
-    # set hugepage	
+    # set hugepage, skip as my AWS already has /dev/hugepages with 4096 pages.
     echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
     mkdir /mnt/huge
     mount -t hugetlbfs nodev /mnt/huge
@@ -22,43 +24,46 @@
     echo 0 > /proc/sys/kernel/randomize_va_space
 
     # insmod ko
-    modprobe uio
-    modprobe hwmon
-    insmod build/kmod/igb_uio.ko
-    insmod build/kmod/rte_kni.ko carrier=on
+    sudo modprobe uio
+    sudo modprobe hwmon
+    sudo insmod build/kmod/igb_uio.ko
+    sudo insmod build/kmod/rte_kni.ko carrier=on
 
     # set ip address
     #redhat7.3
-    export myaddr=`ifconfig eth0 | grep "inet" | grep -v ":" | awk -F ' '  '{print $2}'`
-    export mymask=`ifconfig eth0 | grep "netmask" | awk -F ' ' '{print $4}'`
-    export mybc=`ifconfig eth0 | grep "broadcast" | awk -F ' ' '{print $6}'`
-    export myhw=`ifconfig eth0 | grep "ether" | awk -F ' ' '{print $2}'`
-    export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
-    #Amazon Linux AMI 2017.03
-    #export myaddr=`ifconfig eth0 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
-    #export mymask=`ifconfig eth0 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
-    #export mybc=`ifconfig eth0 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
-    #export myhw=`ifconfig eth0 | grep "HWaddr" | awk -F ' ' '{print $5}'`
-    #export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'
+    export myaddr=`ifconfig eth1 | grep "inet" | grep -v ":" | awk -F ' '  '{print $2}'`
+    export mymask=`ifconfig eth1 | grep "netmask" | awk -F ' ' '{print $4}'`
+    export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
+    export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
+    export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`
+    ==== doesn't have inet addr  #Amazon Linux AMI 2017.03
+      #export myaddr=`ifconfig eth1 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
+      #export mymask=`ifconfig eth1 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
+      #export mybc=`ifconfig eth1 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
+      #export myhw=`ifconfig eth1 | grep "HWaddr" | awk -F ' ' '{print $5}'`
+      #export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'
 
     sed "s/addr=192.168.1.2/addr=${myaddr}/" -i /data/f-stack/config.ini
     sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i /data/f-stack/config.ini
     sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i /data/f-stack/config.ini
     sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i /data/f-stack/config.ini
 
-    # enable kni
-    sed "s/#\[kni\]/\[kni\]/" -i /data/f-stack/config.ini
-    sed "s/#enable=1/enable=1/" -i /data/f-stack/config.ini
-    sed "s/#method=reject/method=reject/" -i /data/f-stack/config.ini
-    sed "s/#tcp_port=80/tcp_port=80/" -i /data/f-stack/config.ini
-    sed "s/#vlanstrip=1/vlanstrip=1/" -i /data/f-stack/config.ini
+      # enable kni === don't activate knni because dual NIC cards and I'm using eth1
+      sed "s/#\[kni\]/\[kni\]/" -i /data/f-stack/config.ini
+      sed "s/#enable=1/enable=1/" -i /data/f-stack/config.ini
+      sed "s/#method=reject/method=reject/" -i /data/f-stack/config.ini
+      sed "s/#tcp_port=80/tcp_port=80/" -i /data/f-stack/config.ini
+      sed "s/#vlanstrip=1/vlanstrip=1/" -i /data/f-stack/config.ini
 
     # Compile F-Stack lib
-    export FF_PATH=/data/f-stack
-    export FF_DPDK=/data/f-stack/dpdk/build
-    cd /data/f-stack/lib
+    export FF_PATH=~/f-stack
+    export FF_DPDK=~/f-stack/dpdk/build
+    cd ~/f-stack/lib
     make
-
+    # have to hack fixing some compile issue when using gcc10
+    ../../freebsd/kern/kern_linker.c, add #pragma GCC diagnostic ignored "-Wformat-overflow"
+    ../../freebsd/libkern/zlib.c, add #pragma GCC diagnostic ignored "-Wnonnull"
+    
     # Compile Nginx
     cd ../app/nginx-1.16.1
     ./configure --prefix=/usr/local/nginx_fstack --with-ff_module
