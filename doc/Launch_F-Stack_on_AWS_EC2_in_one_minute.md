@@ -36,6 +36,7 @@
     export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
     export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
     export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`
+    
       ==== doesn't have inet addr  #Amazon Linux AMI 2017.03
       #export myaddr=`ifconfig eth1 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
       #export mymask=`ifconfig eth1 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
