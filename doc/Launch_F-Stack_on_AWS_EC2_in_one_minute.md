@@ -36,18 +36,48 @@
     export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
     export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
     export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`
-    ==== doesn't have inet addr  #Amazon Linux AMI 2017.03
+      ==== doesn't have inet addr  #Amazon Linux AMI 2017.03
       #export myaddr=`ifconfig eth1 | grep "inet addr" | awk -F ' '  '{print $2}' |  awk -F ':' '{print $2}'`
       #export mymask=`ifconfig eth1 | grep "Mask" | awk -F ' ' '{print $4}' |  awk -F ':' '{print $2}'`
       #export mybc=`ifconfig eth1 | grep "Bcast" | awk -F ' ' '{print $3}' |  awk -F ':' '{print $2}'`
       #export myhw=`ifconfig eth1 | grep "HWaddr" | awk -F ' ' '{print $5}'`
       #export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'
 
-    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i /data/f-stack/config.ini
-    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i /data/f-stack/config.ini
-    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i /data/f-stack/config.ini
-    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i /data/f-stack/config.ini
+    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i ~/f-stack/config.ini
+    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i ~/f-stack/config.ini
+    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i ~/f-stack/config.ini
+    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i ~/config.ini
 
+    ====== use eth1 instead, leave eth0 for other normal app, use sudo reboot to recover all the machine settings from AWS.
+    [root@TA-TKY-C-07 f-stack]# ifconfig
+    eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+            inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
+            ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
+            RX packets 2031848  bytes 2280930590 (2.1 GiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 1004053  bytes 334497678 (319.0 MiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+    eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
+            inet 10.50.12.75  netmask 255.255.255.0  broadcast 10.50.12.255
+            ether 06:0c:8b:7c:8c:e1  txqueuelen 1000  (Ethernet)
+            RX packets 2947  bytes 138960 (135.7 KiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 103  bytes 35226 (34.4 KiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+     ip addr:
+        3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc mq state UP group default qlen 1000
+            link/ether 06:0c:8b:7c:8c:e1 brd ff:ff:ff:ff:ff:ff
+            inet 10.50.12.75/24 brd 10.50.12.255 scope global dynamic eth1
+            valid_lft 2865sec preferred_lft 2865sec
+
+    so replace it as:
+    export myaddr=10.50.12.75
+    export mymask=255.255.255.0
+    export mybc=10.50.12.255
+    export myhw=06:0c:8b:7c:8c:e1
+    export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'`    ======== same as eth0, it's 10.50.12.1
+    
       # enable kni === don't activate kni because dual NIC cards and I'm using eth1
       sed "s/#\[kni\]/\[kni\]/" -i /data/f-stack/config.ini
       sed "s/#enable=1/enable=1/" -i /data/f-stack/config.ini
@@ -68,22 +98,13 @@
     cd ../app/nginx-1.16.1
     ./configure --prefix=/usr/local/nginx_fstack --with-ff_module
     make
-    sudo make install
-      # to directory /usr/local/nginx_fstack
-
-        eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
-                inet 10.50.12.75  netmask 255.255.255.0  broadcast 10.50.12.255
-                ether 06:0c:8b:7c:8c:e1  txqueuelen 1000  (Ethernet)
-                RX packets 1319  bytes 63236 (61.7 KiB)
-                RX errors 0  dropped 0  overruns 0  frame 0
-                TX packets 1319  bytes 69798 (68.1 KiB)
-                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+    sudo make install  # to directory /usr/local/nginx_fstack
 
     # offload NIC（if there is only one NIC，the follow commands must run in a script）
     sudo ifconfig eth1 down
     sudo ~/f-stack/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
 
-        ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
+    ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
           Network devices using DPDK-compatible driver
           ============================================
           0000:00:06.0 'Elastic Network Adapter (ENA) ec20' drv=igb_uio unused=ena
@@ -120,7 +141,8 @@
       <p><em>Thank you for using F-Stack.</em></p>
       </body>
       </html>
-      
+     
+    # ==== skip the following two steps
     # start Nginx
     sudo /usr/local/nginx_fstack/sbin/nginx
 
