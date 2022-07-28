@@ -48,6 +48,8 @@
     sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i ~/f-stack/config.ini
     sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i ~/f-stack/config.ini
     sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i ~/config.ini
+    sed "s/pkt_tx_delay=100/pkt_tx_delay=0/" -i ~/config.ini
+    
 
     ====== use eth1 instead, leave eth0 for other normal app, use sudo reboot to recover all the machine settings from AWS.
     [root@TA-TKY-C-07 f-stack]# ifconfig
