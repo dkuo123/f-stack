@@ -94,6 +94,7 @@
     # have to hack fixing some compile issue when using gcc10
     ../../freebsd/kern/kern_linker.c, add #pragma GCC diagnostic ignored "-Wformat-overflow"
     ../../freebsd/libkern/zlib.c, add #pragma GCC diagnostic ignored "-Wnonnull"
+    sudo make install  ----- install to /usr/local/ include and lib directory. /etc/f-stack.conf = config.ini
     
     # Compile Nginx
     cd ../app/nginx-1.16.1
