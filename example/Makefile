@@ -16,8 +16,11 @@ TARGET="helloworld"
 all:
 	cc -O -gdwarf-2  -I../lib -o ${TARGET} main.c ${LIBS}
 	cc -O -gdwarf-2  -I../lib -o ${TARGET}_epoll main_epoll.c ${LIBS}
-	cc -O -gdwarf-2  -I../lib -o ff_server ff_server.c ${LIBS}
-	cc -O -gdwarf-2  -I../lib -o raw_server raw_server.c ${LIBS}
+	# cc -O -gdwarf-2  -I../lib -o ff_server ff_server.c ${LIBS}
+	# cc -O -gdwarf-2  -I../lib -o raw_server raw_server.c ${LIBS}
+	g++ -std=c++17 -O2 -I../lib -o ff_server ff_server.c ${LIBS}
+	g++ -std=c++17 -O2 -I../lib -o raw_server raw_server.c ${LIBS}
+	g++ -std=c++17 -O2 -I../lib -o ff_epoll_server ff_epoll_server.cpp ${LIBS}
 
 .PHONY: clean
 clean:

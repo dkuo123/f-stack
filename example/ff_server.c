@@ -67,7 +67,7 @@ int loop(void *arg)
         }
         else if (event.filter == EVFILT_WRITE)
         {
-            char* msg = "hi, welcome connect!";
+            const char* msg = "hi, welcome connect!";
             ff_write(curfd, msg, strlen(msg));
         }
         else
