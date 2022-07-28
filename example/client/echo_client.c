@@ -5,8 +5,18 @@
 #include <errno.h>
 #include <time.h>
 
-// gcc -DUSE_RAW -o raw_client echo_client.c
-// gcc -o ff_client echo_client.c
+// gcc -O2 -DUSE_RAW -o raw_client echo_client.c
+// gcc -O2 -o ff_client echo_client.c
+/*
+start server on ip=10.50.12.75, port=54321
+INFO! prepare connect server...
+INFO! connect ok! fd=3
+INFO! write read finish! packetlen=1024 times=10000 sendsum=10240000 recvsum=10240000 cost=1126
+
+real    18m46.905s
+user    0m0.023s
+sys     0m0.377s
+*/
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
@@ -62,7 +72,7 @@ int main(int argc, char *argv[])
     long int recvsum = 0;
     for (int k = 0; k < TEST_TIMES; ++k)
     {
-        printf("testing k=%d\n", k);
+        // printf("testing k=%d\n", k);
         ret = write(sockfd, data, sendlen);
         if (ret <= 0)
         {
