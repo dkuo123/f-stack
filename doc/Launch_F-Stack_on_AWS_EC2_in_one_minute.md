@@ -114,9 +114,12 @@
           ===================================
           0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
 
+    # run test server
+     cd example
+     sudo ./ff_epoll_server --conf ../config.ini --proc-type=primary --proc-id=0
+
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
     sudo cp ~/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
-
     # test setup using hello world web app:
     $ sudo ./example/helloworld --conf config.ini --proc-type=primary --proc-id=0
     # on another box, do:
