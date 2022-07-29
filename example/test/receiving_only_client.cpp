@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
                 printf("ERROR! expect size =%lu got larger=%lu\n", expected, ret);
                 break;
             } else {
-                printf("%d, reading %s package len = %d\n", i,
-                    (ret < expected? "partial":"full"), ret);
+                // printf("%d, reading %s package len = %d\n", i,
+                //     (ret < expected? "partial":"full"), ret);
                 next += ret;
             }
             head = 0;
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
                     printf("ERROR! expect seq=%d got=%d\n", i, received->seq);
                     return 1;
                 } else {
-                    printf("got %d\n", i);
+                    // printf("got %d\n", i);
                     ++i;
                     head += expected;
                     next -= expected;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     }
 
     time_t end = time(NULL);
-    printf("times=%d, duration in seconds=%ld\n",
-            TEST_TIMES, end - start);
+    printf("send %d times, each time BATCH=%d, duration in seconds=%ld\n",
+            TEST_TIMES, BATCH, end - start);
 
     shutdown(sockfd, SHUT_RDWR);
     close(sockfd);
