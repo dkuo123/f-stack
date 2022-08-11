@@ -5,14 +5,24 @@
     sudo -i
     yum install -y git gcc openssl-devel kernel-devel-$(uname -r) bc numactl-devel mkdir make net-tools vim pciutils iproute pcre-devel zlib-devel elfutils-libelf-devel meson
 
-    git clone https://github.com/F-Stack/f-stack.git 
+    git clone https://github.com/F-Stack/f-stack.git f-stack-dev
 
     # Compile DPDK
-    cd f-stack/dpdk
+    cd f-stack-dev/dpdk
     meson -Denable_kmods=true build
     ninja -C build
-    ninja -C build install
-
+    sudo ninja -C build install
+      --- Installing subdir /home/archy/f-stack-dev/dpdk/examples to /usr/local/share/dpdk/examples
+      --- all .a libs to  /usr/local/lib64 & /usr/local/lib64/dpdk
+      --- a bunch of dpdk-* to  /usr/local/bin
+      --- Installing kernel/linux/kni/rte_kni.ko to /lib/modules/5.10.130-118.517.amzn2.x86_64/extra/dpdk
+      --- Installing kernel/linux/igb_uio/igb_uio.ko to /lib/modules/5.10.130-118.517.amzn2.x86_64/extra/dpdk
+      --- include files to /usr/local/include & /usr/local/include/generic
+      --- cmake package file libdpdk-libs.pc & libdpdk.pc to /usr/local/lib64/pkgconfig
+      --- a lot of .so files to /usr/local/lib64/librte*.so and /usr/local/lib64/dpdk/*
+      
+      
+       
     # set hugepage	
     echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
     mkdir /mnt/huge
@@ -71,6 +81,7 @@
     sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i config.ini
     sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i config.ini
     sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i config.ini
+    sed "s/pkt_tx_delay=100/pkt_tx_delay=0/" -i config.ini
 
     # enable kni ---- skip it, as it's using eth1?
     sed "s/#\[kni\]/\[kni\]/" -i config.ini
@@ -91,9 +102,10 @@
     ln -s /usr/local/bin/pkg-config /usr/bin/pkg-config
 
     # Compile F-Stack lib
-    export FF_PATH=/home/archy/f-stack
+    export FF_PATH=/home/archy/f-stack-dev
+    export FF_DPDK=$FF_PATH/dpdk/build
     export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/lib/pkgconfig
-    cd ~/f-stack/lib
+    cd ~/f-stack-dev/lib
     make
     sudo make install  ------ include and lib are in /usr/local/include and /usr/local/lib  
                                /usr/local/bin/ff_start
@@ -106,7 +118,7 @@
     make install   ============> installed to /usr/local/nginx_fstack
 
     # offload NIC（if there is only one NIC，the follow commands must run in a script）
-    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
+    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack-dev/dpdk/usertools/dpdk-devbind.py -s
 
     Network devices using kernel driver
     ===================================
@@ -114,14 +126,14 @@
     0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio *Active*
 
         sudo ifconfig eth1 down
-    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack/dpdk/usertools/dpdk-devbind.py -s
+    (base) [archy@TA-TKY-C-07 dpdk]$ ~/f-stack-dev/dpdk/usertools/dpdk-devbind.py -s
 
     Network devices using kernel driver
     ===================================
     0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
     0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio
 
-        sudo ~/f-stack/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
+        sudo ~/f-stack-dev/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
     (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
     Network devices using DPDK-compatible driver
@@ -132,7 +144,7 @@
     ===================================
     0000:00:05.0 'Elastic Network Adapter (ENA) ec20' if=eth0 drv=ena unused=igb_uio *Active*
 
-    (base) [archy@TA-TKY-C-07 dpdk]$ ifconfig
+    (base) [archy@TA-TKY-C-07 dpdk]$ ifconfig 
     eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 9001
             inet 10.50.12.133  netmask 255.255.255.0  broadcast 10.50.12.255
             ether 06:ee:25:e5:e1:2b  txqueuelen 1000  (Ethernet)
@@ -151,7 +163,7 @@
 
 
     # copy config.ini to $NGX_PREFIX/conf/f-stack.conf
-    sudo cp ~/f-stack/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
+    sudo cp ~/f-stack-dev/config.ini /usr/local/nginx_fstack/conf/f-stack.conf
 
     # starting test program:
     sudo ./example/helloworld --conf config.ini --proc-type=primary --proc-id=0
