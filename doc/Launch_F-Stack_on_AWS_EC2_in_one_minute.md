@@ -44,11 +44,11 @@
       #export myhw=`ifconfig eth1 | grep "HWaddr" | awk -F ' ' '{print $5}'`
       #export mygw=`route -n | grep 0.0.0.0 | grep eth1 | grep UG | awk -F ' ' '{print $2}'
 
-    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i ~/f-stack/config.ini
-    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i ~/f-stack/config.ini
-    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i ~/f-stack/config.ini
-    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i ~/config.ini
-    sed "s/pkt_tx_delay=100/pkt_tx_delay=0/" -i ~/config.ini
+    sed "s/addr=192.168.1.2/addr=${myaddr}/" -i ../config.ini
+    sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i ../config.ini
+    sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i ../config.ini
+    sed "s/gateway=192.168.1.1/gateway=${mygw}/" -i ../config.ini
+    sed "s/pkt_tx_delay=100/pkt_tx_delay=0/" -i ../config.ini
     
 
     ====== use eth1 instead, leave eth0 for other normal app, use sudo reboot to recover all the machine settings from AWS.
