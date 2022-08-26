@@ -23,10 +23,10 @@
       
       
        
-    # set hugepage	
-    echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-    mkdir /mnt/huge
-    mount -t hugetlbfs nodev /mnt/huge
+    # set hugepage	--- AWS has it already with 4096 in  /dev/hugepages/
+    # echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+    # mkdir /mnt/huge
+    # mount -t hugetlbfs nodev /mnt/huge
 
     # close ASLR; it is necessary in multiple process
     echo 0 > /proc/sys/kernel/randomize_va_space
@@ -134,6 +134,7 @@
     0000:00:06.0 'Elastic Network Adapter (ENA) ec20' if=eth1 drv=ena unused=igb_uio
 
         sudo ~/f-stack-dev/dpdk/usertools/dpdk-devbind.py --bind=igb_uio eth1
+        or use 0000:00:06.0 if eth1 doesn't work anymore
     (base) [archy@TA-TKY-C-07 dpdk]$ usertools/dpdk-devbind.py -s
 
     Network devices using DPDK-compatible driver
