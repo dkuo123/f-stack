@@ -13,7 +13,7 @@
     ninja -C build
     sudo ninja -C build install
       --- Installing subdir /home/archy/f-stack-dev/dpdk/examples to /usr/local/share/dpdk/examples
-      --- all .a libs to  /usr/local/lib64 & /usr/local/lib64/dpdk
+      --- all librte_*.a and .so libs to  /usr/local/lib64 & /usr/local/lib64/dpdk
       --- a bunch of dpdk-* to  /usr/local/bin
       --- Installing kernel/linux/kni/rte_kni.ko to /lib/modules/5.10.130-118.517.amzn2.x86_64/extra/dpdk
       --- Installing kernel/linux/igb_uio/igb_uio.ko to /lib/modules/5.10.130-118.517.amzn2.x86_64/extra/dpdk
@@ -36,6 +36,7 @@
     sudo modprobe hwmon
     sudo insmod build/kernel/linux/igb_uio/igb_uio.ko
     sudo insmod build/kernel/linux/kni/rte_kni.ko carrier=on
+    # if old version is installed, like the ones from master build, sudo rmmod igb_uio.ko, sudo rmmod rte_kni.ko
 
     # set ip address
     
@@ -76,7 +77,7 @@
     export mybc=`ifconfig eth1 | grep "broadcast" | awk -F ' ' '{print $6}'`
     export myhw=`ifconfig eth1 | grep "ether" | awk -F ' ' '{print $2}'`
     export mygw=`route -n | grep 0.0.0.0 | grep eth0 | grep UG | awk -F ' ' '{print $2}'`
-    cd ~/f-stack
+    cd ~/f-stack-dev
     sed "s/addr=192.168.1.2/addr=${myaddr}/" -i config.ini
     sed "s/netmask=255.255.255.0/netmask=${mymask}/" -i config.ini
     sed "s/broadcast=192.168.1.255/broadcast=${mybc}/" -i config.ini
